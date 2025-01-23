@@ -133,7 +133,7 @@ workflows:
           filters:
             branches:
               only: release   
-       - scan:
+      - scan:
           requires:
             - test
           filters:
@@ -157,3 +157,4 @@ workflows:
           filters:
             branches:
               only: release   
+  
