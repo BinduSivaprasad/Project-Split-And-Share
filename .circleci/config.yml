@@ -3,7 +3,7 @@ version: 2.1
 orbs:
   heroku: circleci/heroku@2.0.0
   docker: circleci/docker@2.1.4
-
+  snyk: snyk/snyk@1.5.0
 
 executors:
   maven-executor:
@@ -68,6 +68,30 @@ jobs:
             heroku stack:set container -a bindu-split-and-share
             heroku container:push web -a bindu-split-and-share
             heroku container:release web -a bindu-split-and-share    
+  scan:
+    docker: 
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: bindugopinathan/project_split_and_share
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run: docker build -t $IMAGE_NAME .
+      - snyk/scan: 
+          docker-image-name: $IMAGE_NAME
+  codescan:
+    docker: 
+      - image: cimg/node:16.10
+    environment:
+      IMAGE_NAME: bindugopinathan/project_split_and_share
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - snyk/install
+      - run: |
+          snyk code test          
 
 workflows:
   ci_flow:
@@ -83,6 +107,18 @@ workflows:
           filters:
             branches: 
               only: develop  
+      - scan:
+          requires:
+            - test
+          filters:
+            branches:
+              only: develop   
+      - codescan:
+          requires:
+            - test
+          filters:
+            branches:
+              only: develop             
        
 
   cicd_flow:
@@ -90,26 +126,34 @@ workflows:
       - build:
           filters:
             branches:
-              only:
-                - release 
+              only: release 
       - test:
           requires:
             - build
           filters:
             branches:
-              only:
-                - release   
+              only: release   
+       - scan:
+          requires:
+            - test
+          filters:
+            branches:
+              only: release   
+      - codescan:
+          requires:
+            - test 
+          filters:
+            branches:
+              only: release              
       - build-docker-image:
           requires:
             - test
           filters:
             branches:
-              only:
-                - release   
+              only: release   
       - deploy:
           requires:
             - build-docker-image
           filters:
             branches:
-              only:
-                - release   
+              only: release   
