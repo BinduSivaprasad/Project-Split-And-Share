@@ -112,11 +112,11 @@ workflows:
               only: develop 
       - codescan:
           requires:
-            -test
+            - test
           filters:
             branches:
               only: develop                   
-       
+      
 
   cicd_flow:
     jobs:
