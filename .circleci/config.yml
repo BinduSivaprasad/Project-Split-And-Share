@@ -68,18 +68,7 @@ jobs:
             heroku stack:set container -a bindu-split-and-share
             heroku container:push web -a bindu-split-and-share
             heroku container:release web -a bindu-split-and-share    
-  scan:
-    docker: 
-      - image: cimg/node:16.10
-    environment:
-      IMAGE_NAME: bindugopinathan/project_split_and_share
-    steps:
-      - checkout
-      - setup_remote_docker
-      - docker/check
-      - run: docker build -t $IMAGE_NAME .
-      - snyk/scan: 
-          docker-image-name: $IMAGE_NAME
+
   codescan:
     docker: 
       - image: cimg/node:16.10
@@ -94,9 +83,7 @@ jobs:
           command: docker build -t $IMAGE_NAME .
       - run:
           name: Docker Login
-          command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push bindugopinathan/project_split_and_share:tagname
+          command: echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - snyk/install
       - run: |
           snyk code test          
@@ -114,19 +101,7 @@ workflows:
             - build
           filters:
             branches: 
-              only: develop  
-      - scan:
-          requires:
-            - test
-          filters:
-            branches:
-              only: develop   
-      - codescan:
-          requires:
-            - test
-          filters:
-            branches:
-              only: develop             
+              only: develop          
        
 
   cicd_flow:
@@ -147,13 +122,6 @@ workflows:
           filters:
             branches:
               only: release          
-      - scan:
-          requires:
-            - test
-            - build-docker-image
-          filters:
-            branches:
-              only: release   
       - codescan:
           requires:
             - test 
