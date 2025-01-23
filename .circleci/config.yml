@@ -88,7 +88,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - docker/check
+      - docker/check    
       - run:
           name: Build Docker Image
           command: docker build -t $IMAGE_NAME .
@@ -136,24 +136,26 @@ workflows:
           filters:
             branches:
               only: release   
+      - build-docker-image:
+          requires:
+            - test
+          filters:
+            branches:
+              only: release          
       - scan:
           requires:
             - test
+            - build-docker-image
           filters:
             branches:
               only: release   
       - codescan:
           requires:
             - test 
+            - build-docker-image
           filters:
             branches:
-              only: release              
-      - build-docker-image:
-          requires:
-            - test
-          filters:
-            branches:
-              only: release   
+              only: release               
       - deploy:
           requires:
             - build-docker-image
