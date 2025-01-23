@@ -27,3 +27,4 @@ RUN ./mvnw package -DskipTests
 #Default command to start the Spring Boot Application
 
 CMD ["./mvnw","spring-boot:run"]
+EXPOSE $PORT
