@@ -80,15 +80,15 @@ jobs:
           name: Run Snyk Code scan
           command: snyk code test --severity-threshold=medium    
   deploy:
-  executor: maven-executor
-  steps:
-    - setup_remote_docker
-    - heroku/install
-    - checkout
-    - run:
+    executor: maven-executor
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
+      - run:
         name: Deploy Application
         command: echo "Deploying application to the production environment..."
-    - run:
+      - run:
         name: Heroku Container Push
         command: |
           heroku container:login
