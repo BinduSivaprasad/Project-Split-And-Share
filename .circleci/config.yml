@@ -67,7 +67,8 @@ jobs:
           name: Build Docker Image
           command: docker build -t $IMAGE_NAME .
       - snyk/scan:
-          docker-image-name: $IMAGE_NAME          
+          docker-image-name: $IMAGE_NAME  
+          severity-threshold: high        
   codescan:
     docker: 
       - image: cimg/node:16.10
@@ -150,7 +151,7 @@ workflows:
               only: release               
       - deploy:
           requires:
-            - build-docker-image
+            - codescan
           filters:
             branches:
               only: release   
